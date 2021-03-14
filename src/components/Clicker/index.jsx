@@ -43,6 +43,13 @@ export const Clicker = ({
   const enterPress = useKeyPress('Enter');
   const spacePress = useKeyPress(' ');
 
+  const handleReset = () => {
+    window.localStorage.removeItem('clicker_score');
+    window.localStorage.removeItem('clicker_clicks');
+    setClicks(0);
+    setScore(0);
+  };
+
   const onClick = () => {
     setIsAnimating(true);
     setClicks((prevState) => prevState + 1);
@@ -52,6 +59,7 @@ export const Clicker = ({
   useEffect(() => {
     if (enterPress || spacePress) {
       setIsAnimating(true);
+      setClicks((prevState) => prevState + 1);
       setScore((prevState) => prevState + getIncrementValue(prevState));
     }
   }, [enterPress, spacePress]);
@@ -84,7 +92,8 @@ export const Clicker = ({
 
   return (
     <Wrapper>
-      <Clicks>Clicks: {formattedClicks}</Clicks>
+        <ResetButton onClick={handleReset}>Reset</ResetButton>
+        <Clicks>Clicks: {formattedClicks}</Clicks>
         <h1>
   {/* <div>{score.toString().length}</div>
   <div>{Math.pow(10,6)}</div> */}
@@ -164,6 +173,24 @@ const MotionButton = styled(motion.button)`
     border: 10px solid gold;
     background-color: #ffe139;
   }
+`;
+
+const ResetButton = styled.button`
+  color: gold;
+  background-color: black;
+  position: absolute;
+  height: 30px;
+  width: 100px;
+  top:0;
+  left: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  &:hover {
+    cursor: pointer;
+  }
+
 `;
 
 const Clicks = styled.div`

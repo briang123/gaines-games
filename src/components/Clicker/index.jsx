@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import useKeyPress from './../../hooks/useKeyPress';
 import styled from 'styled-components';
@@ -36,10 +36,11 @@ export const Clicker = ({
   initialScore = window.localStorage.getItem('clicker_score') || 0,
   initialClicks = window.localStorage.getItem('clicker_clicks') || 0,
 }) => {
-  const [score, setScore] = useState(Number(initialScore)); 
-  const [clicks, setClicks] = useState(Number(initialClicks))
+  const clickRef = useRef();
+  const [score, setScore] = useState(Number(initialScore));
+  const [clicks, setClicks] = useState(Number(initialClicks));
   const [isAnimating, setIsAnimating] = useState(false);
- 
+
   const enterPress = useKeyPress('Enter');
   const spacePress = useKeyPress(' ');
 
@@ -48,30 +49,29 @@ export const Clicker = ({
     window.localStorage.removeItem('clicker_clicks');
     setClicks(0);
     setScore(0);
+    clickRef.current.focus();
   };
 
-  const onClick = () => {
+  const incrementValue = () => {
     setIsAnimating(true);
-    setClicks((prevState) => prevState + 1);
-    setScore((prevState) => prevState + getIncrementValue(prevState));
+
+    const clickCount = clicks + 1;
+    const newScore = score + getIncrementValue(score);
+
+    setClicks(clickCount);
+    setScore(newScore);
+
+    window.localStorage.setItem('clicker_score', newScore);
+    window.localStorage.setItem('clicker_clicks', clickCount);
   };
+
+  const onClick = () => incrementValue();
 
   useEffect(() => {
     if (enterPress || spacePress) {
-      setIsAnimating(true);
-      setClicks((prevState) => prevState + 1);
-      setScore((prevState) => prevState + getIncrementValue(prevState));
+      incrementValue();
     }
   }, [enterPress, spacePress]);
-
-  useEffect(() => {
-    window.localStorage.setItem('clicker_score', score);
-    window.localStorage.setItem('clicker_clicks', clicks);
-  }, [score, clicks]);
-
-  useEffect(() => {
-    window.localStorage.removeItem('clicker_value');
-  }, [])
 
   const formattedScore = `$${getFormattedValue(score)}`;
   const formattedClicks = getFormattedValue(clicks);
@@ -86,35 +86,46 @@ export const Clicker = ({
       rotate: [0, 0, 270, 270, 0],
       opacity: [1, 0.5, 0.5, 0.5, 1],
       borderRadius: ['50%', '50%', '20%', '20%', '50%'],
-      borderShadow: ['50%', '50%', '20%', '20%', '50%'],
     },
+    textAnimate: {
+      scale: [1, 2, 2, 1, 1],
+    }
   };
 
   return (
     <Wrapper>
-        <ResetButton onClick={handleReset}>Reset</ResetButton>
-        <Clicks>Clicks: {formattedClicks}</Clicks>
-        <h1>
-  {/* <div>{score.toString().length}</div>
+      <ResetButton onClick={handleReset}>Reset</ResetButton>
+      <Clicks>Clicks: {formattedClicks}</Clicks>
+      <h1>
+        {/* <div>{score.toString().length}</div>
   <div>{Math.pow(10,6)}</div> */}
-          <Score
-            key={formattedScore}
-            initial="initial"
-            animate={isAnimating ? 'animate' : 'initial'}
-            exit="initial"
-            variants={variants}
-          ></Score>
-          <Text>{formattedScore}</Text>
-        </h1>
-        <MotionButton
-          key={random(1,10)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          animate={{ scale: .9 }}
-          onClick={onClick}
+        <Score
+          key={formattedScore}
+          initial="initial"
+          animate={isAnimating ? 'animate' : 'initial'}
+          exit="initial"
+          variants={variants}
+        ></Score>
+        <Text
+          key={random(11, 20)}
+          initial="initial"
+          animate={isAnimating ? 'textAnimate' : 'initial'}
+          exit="initial"
+          variants={variants}
         >
-          GNZ T🤑KNS
-        </MotionButton>
+          {formattedScore}
+        </Text>
+      </h1>
+      <MotionButton
+        ref={clickRef}
+        key={random(1, 10)}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        animate={{ scale: 0.9 }}
+        onClick={onClick}
+      >
+        GNZ T🤑KNS
+      </MotionButton>
     </Wrapper>
   );
 };
@@ -129,9 +140,9 @@ const Wrapper = styled.div`
   box-sizing: border-box;
 `;
 
-const Text = styled.div`
+const Text = styled(motion.div)`
   margin-top: -300px;
-  z-index: 2;
+  z-index: 100;
   font-size: 1em;
   color: gold;
   display: flex;
@@ -181,7 +192,7 @@ const ResetButton = styled.button`
   position: absolute;
   height: 30px;
   width: 100px;
-  top:0;
+  top: 0;
   left: 0;
   font-size: 1rem;
   font-weight: bold;
@@ -190,7 +201,6 @@ const ResetButton = styled.button`
   &:hover {
     cursor: pointer;
   }
-
 `;
 
 const Clicks = styled.div`
@@ -198,12 +208,12 @@ const Clicks = styled.div`
   border-left: solid 8px gold;
   border-bottom: solid 3px gold;
   padding: 10px;
+  min-width: 200px;
   font-weight: bold;
   position: absolute;
-  top:0;
+  top: 0;
   right: 0;
   ${textShadow}
 `;
-
 
 export default Clicker;

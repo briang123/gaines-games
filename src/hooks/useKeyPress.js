@@ -4,14 +4,14 @@ export const useKeyPress = (targetKey) => {
   const [keyPressed, setKeyPressed] = useState(false);
 
   const downHandler = ({ key }) => {
-    console.log('down',key);
+    // console.log('down',key);
     if (key === targetKey) {
       setKeyPressed(true);
     }
   };
 
   const upHandler = ({ key }) => {
-    console.log('up',key);
+    // console.log('up',key);
     if (key === targetKey) {
       setKeyPressed(false);
     }

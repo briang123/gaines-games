@@ -6,7 +6,49 @@ import styled from 'styled-components';
 const getIncrementValue = (score) => Math.floor(score / 100) || 1;
 const getFormattedValue = (number) => new Intl.NumberFormat().format(number);
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+const digitCount = (number) => Math.ceil(Math.log10(number));
 
+
+const getNumName = (digits) => {
+  switch(true) {
+    case digits < 9: return "M";
+    case digits < 12: return "B";
+    case digits < 15: return "TR";
+    case digits < 18: return "QD";
+    case digits < 21: return "QN";
+    case digits < 24: return "SX";
+    case digits < 27: return "SP";
+    case digits < 31: return "OCT";
+    case digits < 34: return "NON";
+    case digits < 37: return "DEC";
+    case digits < 40: return "UND";
+    case digits < 43: return "DUO";
+    case digits < 46: return "TRE";
+    case digits < 49: return "QTD";
+    case digits < 52: return "QND";
+    case digits < 55: return "SED";
+    case digits < 58: return "OTD";
+    case digits < 61: return "NVD";
+    case digits < 64: return "VGT";
+    case digits < 67: return "UVT";
+    case digits < 70: return "DVT";
+    case digits < 73: return "TVT";
+    case digits < 76: return "QTT";
+
+    default: return "GNZ"
+  }
+}
+
+const abbrevNumber = (number) => {
+  const expNum = Number(number).toExponential(3);
+  const parts = expNum.toString().split('e+');
+  const [ num, digits ] = parts;
+  
+  //console.log('number', getNumName(digits), expNum, parts, num, digits);
+  if (digits < 7) return number;
+
+  return `${num} ${getNumName(digits)}`;
+}
 //https://en.wikipedia.org/wiki/Names_of_large_numbers
 // const NUMBER_NAMES = [
 //   "Thousand",
@@ -41,6 +83,8 @@ export const Clicker = ({
   const [clicks, setClicks] = useState(Number(initialClicks));
   const [isAnimating, setIsAnimating] = useState(false);
 
+
+  // console.log('power', digitCount(score), abbrevNumber(score))
   const enterPress = useKeyPress('Enter');
   const spacePress = useKeyPress(' ');
 
@@ -73,7 +117,8 @@ export const Clicker = ({
     }
   }, [enterPress, spacePress]);
 
-  const formattedScore = `$${getFormattedValue(score)}`;
+
+  const formattedScore = `$${abbrevNumber(score)}`;
   const formattedClicks = getFormattedValue(clicks);
 
   const variants = {
@@ -91,6 +136,7 @@ export const Clicker = ({
       scale: [1, 2, 2, 1, 1],
     }
   };
+
 
   return (
     <Wrapper>

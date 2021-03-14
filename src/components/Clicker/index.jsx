@@ -35,7 +35,7 @@ const getNumName = (digits) => {
     case digits < 73: return "TVT";
     case digits < 76: return "QTT";
 
-    default: return "GNZ"
+    default: return `GNZ-${digits}`;
   }
 }
 

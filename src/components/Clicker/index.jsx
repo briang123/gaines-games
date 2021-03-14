@@ -45,7 +45,7 @@ const abbrevNumber = (number) => {
   const [ num, digits ] = parts;
   
   //console.log('number', getNumName(digits), expNum, parts, num, digits);
-  if (digits < 7) return number;
+  if (digits < 7) return getFormattedValue(number);
 
   return `${num} ${getNumName(digits)}`;
 }

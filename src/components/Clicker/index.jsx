@@ -2,162 +2,151 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import useKeyPress from './../../hooks/useKeyPress';
 import styled from 'styled-components';
+import { textShadow } from './../../elements/utilities/Elevation';
 
-const getIncrementValue = (score) => Math.floor(score / 100) || 1;
-const getFormattedValue = (number) => new Intl.NumberFormat().format(number);
-const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-const digitCount = (number) => Math.ceil(Math.log10(number));
-
-
-const getNumName = (digits) => {
-  switch(true) {
-    case digits < 9: return "M";
-    case digits < 12: return "B";
-    case digits < 15: return "TR";
-    case digits < 18: return "QD";
-    case digits < 21: return "QN";
-    case digits < 24: return "SX";
-    case digits < 27: return "SP";
-    case digits < 31: return "OCT";
-    case digits < 34: return "NON";
-    case digits < 37: return "DEC";
-    case digits < 40: return "UND";
-    case digits < 43: return "DUO";
-    case digits < 46: return "TRE";
-    case digits < 49: return "QTD";
-    case digits < 52: return "QND";
-    case digits < 55: return "SED";
-    case digits < 58: return "OTD";
-    case digits < 61: return "NVD";
-    case digits < 64: return "VGT";
-    case digits < 67: return "UVT";
-    case digits < 70: return "DVT";
-    case digits < 73: return "TVT";
-    case digits < 76: return "QTT";
-
-    default: return `GNZ-${digits}`;
-  }
+const keyboard = {
+  enterText: 'Enter',
+  spaceBarText: ' ',
 }
 
-const abbrevNumber = (number) => {
+const clickerScore = {
+  unit: 'GNZ',
+  places: 3,
+  placesToFormatWithCommas: 4,
+  getFormattedValue: (value) => new Intl.NumberFormat().format(value),
+  getIncrementValue: (value) => Math.floor(value / 100) || 1,
+  scoreSaveKey: 'clicker_score',
+  clickSaveKey: 'clicker_clicks',
+  buttonText: 'GNZ T🤑KNS',
+}
+
+const clickerStyle = {
+  primaryColor: '#ffd900',
+  secondaryColor: '#ffe139',
+  black: '#000',
+  boxShadow: `box-shadow: 1px 1px 2px black, 0 0 250px blue, 0 0 5px darkblue;`,  
+}
+
+
+// WHAT WE WANT TO ADD TO THE SCORE AFTER CLICKING
+const getIncrementValue = (score) => Math.floor(score / 100) || 1;
+
+// FORMATTING THE COMMAS IN THE VALUE
+const getFormattedValue = (number) => new Intl.NumberFormat().format(number);
+
+// RANDOM NUMBER GENERATOR WITHIN RANGE
+const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+// FORMAT THE SCORE/TOKEN AMOUNT
+const getFormattedScore = (number, unit) => {
   const expNum = Number(number).toExponential(3);
   const parts = expNum.toString().split('e+');
   const [ num, digits ] = parts;
-  
-  //console.log('number', getNumName(digits), expNum, parts, num, digits);
-  if (digits < 7) return getFormattedValue(number);
-
-  return `${num} ${getNumName(digits)}`;
+  if (digits < 4) return getFormattedValue(number);
+  return `${num} ${unit}-${digits}`;
 }
-//https://en.wikipedia.org/wiki/Names_of_large_numbers
-// const NUMBER_NAMES = [
-//   "Thousand",
-//   "Million",
-//   "Billion",
-//   "Trillion",
-//   "Quadrillion",
-//   "Quintillion",
-//   "Sextillion",
-//   "Septillion",
-//   "Octillion",
-//   "Nonillion",
-//   "Decillion",
-//   "Undecillion",
-//   "Duodecillion",
-//   "Tredecillion",
-//   "Quattuordecillion",
-//   "Quindecillion",
-//   "Sexdecillion",
-//   "Septendecillion",
-//   "Octodecillion",
-//   "Novemdecillion",
-//   "Vigintillion",
-// ];
+
+// ANIMATION SEQUENCES
+const clickerVariants = {
+  initial: {
+    scale: 1,
+    opacity: 1,
+  },
+  animate: {
+    scale: [1, 1.1, 1.1, 1, 1],
+    rotate: [0, 0, 270, 270, 0],
+    opacity: [1, 0.5, 0.5, 0.5, 1],
+    borderRadius: ['50%', '50%', '20%', '20%', '50%'],
+  },
+  textAnimate: {
+    scale: [1, 2, 2, 1, 1],
+  }
+};
+
+const resetClickerValues = () => {
+  window.localStorage.removeItem(clickerScore.scoreSaveKey);
+  window.localStorage.removeItem(clickerScore.clickSaveKey);
+}
+
+const saveClickerValues = (score, clicks) => {
+  window.localStorage.setItem(clickerScore.scoreSaveKey, score);
+  window.localStorage.setItem(clickerScore.clickSaveKey, clicks);
+}
+
+const clearPreviousGames = () => {
+  [].map(key => window.localStorage.removeItem(key))
+}
+
+const getClickerValue = (key) => window.localStorage.getItem(key) || 0;
 
 export const Clicker = ({
-  initialScore = window.localStorage.getItem('clicker_score') || 0,
-  initialClicks = window.localStorage.getItem('clicker_clicks') || 0,
+  initialScore = getClickerValue(clickerScore.scoreSaveKey),
+  initialClicks = getClickerValue(clickerScore.clickSaveKey),
 }) => {
   const clickRef = useRef();
   const [score, setScore] = useState(Number(initialScore));
   const [clicks, setClicks] = useState(Number(initialClicks));
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const enterPress = useKeyPress(keyboard.enterText);
+  const spacePress = useKeyPress(keyboard.spaceBarText);
 
-  // console.log('power', digitCount(score), abbrevNumber(score))
-  const enterPress = useKeyPress('Enter');
-  const spacePress = useKeyPress(' ');
-
-  const handleReset = () => {
-    window.localStorage.removeItem('clicker_score');
-    window.localStorage.removeItem('clicker_clicks');
+  const resetValues = () => {
+    resetClickerValues();
     setClicks(0);
     setScore(0);
     clickRef.current.focus();
   };
 
-  const incrementValue = () => {
+  const updateScore = () => {
     setIsAnimating(true);
 
-    const clickCount = clicks + 1;
+    let clickCount = clicks + 1;
     const newScore = score + getIncrementValue(score);
 
     setClicks(clickCount);
     setScore(newScore);
 
-    window.localStorage.setItem('clicker_score', newScore);
-    window.localStorage.setItem('clicker_clicks', clickCount);
+    saveClickerValues(newScore, clickCount);
   };
 
-  const onClick = () => incrementValue();
+  const onClick = (e) => {
+    e.preventDefault();
+    updateScore();
+  }
 
   useEffect(() => {
     if (enterPress || spacePress) {
-      incrementValue();
+      updateScore();
     }
   }, [enterPress, spacePress]);
 
+  useEffect(() => {
+    clearPreviousGames();
+  }, []);
 
-  const formattedScore = `$${abbrevNumber(score)}`;
-  const formattedClicks = getFormattedValue(clicks);
-
-  const variants = {
-    initial: {
-      scale: 1,
-      opacity: 1,
-    },
-    animate: {
-      scale: [1, 1.1, 1.1, 1, 1],
-      rotate: [0, 0, 270, 270, 0],
-      opacity: [1, 0.5, 0.5, 0.5, 1],
-      borderRadius: ['50%', '50%', '20%', '20%', '50%'],
-    },
-    textAnimate: {
-      scale: [1, 2, 2, 1, 1],
-    }
-  };
+  const formattedScore = `$${getFormattedScore(score, clickerScore.unit)}`;
+  const formattedClicks = `Clicks: ${getFormattedValue(clicks)}`;
 
 
   return (
     <Wrapper>
-      <ResetButton onClick={handleReset}>Reset</ResetButton>
-      <Clicks>Clicks: {formattedClicks}</Clicks>
+      <ResetButton onClick={resetValues}>Reset</ResetButton>
+      <Clicks>{formattedClicks}</Clicks>
       <h1>
-        {/* <div>{score.toString().length}</div>
-  <div>{Math.pow(10,6)}</div> */}
         <Score
           key={formattedScore}
           initial="initial"
           animate={isAnimating ? 'animate' : 'initial'}
           exit="initial"
-          variants={variants}
+          variants={clickerVariants}
         ></Score>
         <Text
           key={random(11, 20)}
           initial="initial"
           animate={isAnimating ? 'textAnimate' : 'initial'}
           exit="initial"
-          variants={variants}
+          variants={clickerVariants}
         >
           {formattedScore}
         </Text>
@@ -170,13 +159,12 @@ export const Clicker = ({
         animate={{ scale: 0.9 }}
         onClick={onClick}
       >
-        GNZ T🤑KNS
+        {clickerScore.buttonText}
       </MotionButton>
     </Wrapper>
   );
 };
 
-const textShadow = 'text-shadow: 1px 1px 2px gold, 0 0 25px gold;';
 
 const Wrapper = styled.div`
   display: flex;
@@ -190,17 +178,17 @@ const Text = styled(motion.div)`
   margin-top: -300px;
   z-index: 100;
   font-size: 1em;
-  color: gold;
+  color: ${clickerStyle.primaryColor};
   display: flex;
   justify-content: center;
   align-items: center;
-  ${textShadow}
+  ${textShadow(clickerStyle.primaryColor)};
 `;
 
 const Score = styled(motion.div)`
-  background-color: #000;
-  color: gold;
-  border: solid 10px gold;
+  background-color: ${clickerStyle.black};
+  color: ${clickerStyle.primaryColor};
+  border: solid 10px ${clickerStyle.primaryColor};
   border-radius: 50%;
   height: 500px;
   width: 500px;
@@ -209,32 +197,32 @@ const Score = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 1px 1px 2px black, 0 0 250px blue, 0 0 5px darkblue;
+  ${clickerStyle.boxShadow};
 `;
 
 const MotionButton = styled(motion.button)`
   margin-top: 150px;
   width: 450px;
   height: 135px;
-  color: black;
-  background-color: gold;
+  color: ${clickerStyle.black};
+  background-color: ${clickerStyle.primaryColor};
   font-size: 2.5rem;
   font-weight: bold;
   border: none;
   border-radius: 10px;
   outline: none;
   z-index: 100;
-  box-shadow: 1px 1px 2px black, 0 0 250px blue, 0 0 5px darkblue;
+  ${clickerStyle.boxShadow};
   &:hover {
     cursor: pointer;
-    border: 10px solid gold;
-    background-color: #ffe139;
+    border: 10px solid ${clickerStyle.primaryColor};
+    background-color: ${clickerStyle.secondaryColor};
   }
 `;
 
 const ResetButton = styled.button`
-  color: gold;
-  background-color: black;
+  color: ${clickerStyle.primaryColor};
+  background-color: ${clickerStyle.black};
   position: absolute;
   height: 30px;
   width: 100px;
@@ -250,16 +238,16 @@ const ResetButton = styled.button`
 `;
 
 const Clicks = styled.div`
-  color: gold;
-  border-left: solid 8px gold;
-  border-bottom: solid 3px gold;
+  color: ${clickerStyle.primaryColor};
+  border-left: solid 8px ${clickerStyle.primaryColor};
+  border-bottom: solid 3px ${clickerStyle.primaryColor};
   padding: 10px;
   min-width: 200px;
   font-weight: bold;
   position: absolute;
   top: 0;
   right: 0;
-  ${textShadow}
+  ${textShadow(clickerStyle.primaryColor)}
 `;
 
 export default Clicker;

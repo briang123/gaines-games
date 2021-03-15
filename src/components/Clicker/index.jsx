@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import useKeyPress from './../../hooks/useKeyPress';
 import {
   ClickAmount,
+  IncrementValue,
+  Layout,
   ResetButton,
   Score,
   ScoreContainer,
@@ -31,6 +33,7 @@ export const Clicker = ({
     getFormattedScore,
     getNewClicks,
     getNewScore,
+    incrementValue,
     resetValue,
     saveValue,
     scoreSaveKey,
@@ -91,13 +94,16 @@ export const Clicker = ({
 
   const formattedScore = getFormattedScore(score);
   const formattedClicks = getFormattedClicks(clicks);
+  const formattedIncrements = getFormattedScore(incrementValue);
 
   return (
+    <Layout>
     <Wrapper>
       <ResetButton onClick={resetValues} color={primaryColor} bgColor={color}>
         Reset
       </ResetButton>
       <ClickAmount color={primaryColor}>{formattedClicks}</ClickAmount>
+      <IncrementValue color={primaryColor}>{formattedIncrements}</IncrementValue>
       <ScoreContainer>
         <Score
           key={`ScoreContainer_${formattedScore}`}
@@ -135,6 +141,7 @@ export const Clicker = ({
         {buttonText}
       </TokenButton>
     </Wrapper>
+    </Layout>
   );
 };
 
@@ -154,6 +161,7 @@ const clickerScore = {
   scoreSaveKey: 'clicker_score',
   clickSaveKey: 'clicker_clicks',
   buttonText: 'GNZ T🤑KNS',
+  incrementValue: 0,
   getFormattedValue: (value) => new Intl.NumberFormat().format(value),
   getIncrementValue: (value) => Math.floor(value / 100) || 1,
   getFormattedScore: (value) => {
@@ -167,9 +175,13 @@ const clickerScore = {
     return `${clickerScore.symbol}${num} ${clickerScore.unit}-${digits}`;
   },
   getNewClicks: (value) => value + 1,
-  getNewScore: (score) => score + clickerScore.getIncrementValue(score),
+  getNewScore: (score) => {
+    const incValue = clickerScore.getIncrementValue(score)
+    clickerScore.incrementValue = incValue;
+    return score + incValue;
+  },
   getFormattedClicks: (value) =>
-    `Clicks: ${clickerScore.getFormattedValue(value)}`,
+    `👉 ${clickerScore.getFormattedValue(value)}`,
   resetValue: (keys = []) =>
     keys.map((key) => window.localStorage.removeItem(key)),
   saveValue: (key, value) => window.localStorage.setItem(key, value),
@@ -203,6 +215,6 @@ const clickerScore = {
 const clickerStyle = {
   primaryColor: '#ffd900',
   secondaryColor: '#ffe139',
-  black: '#000',
-  boxShadow: `box-shadow: 1px 1px 2px black, 0 0 250px blue, 0 0 5px darkblue;`,
+  black: '#040524',
+  boxShadow: `box-shadow: 1px 1px 2px #040524, 0 0 250px blue, 0 0 5px darkblue;`,
 };

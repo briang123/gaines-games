@@ -1,9 +1,6 @@
-import elevation from './Elevation';
-
 export * from './Breakpoints';
-export * from './Position';
 export * from './Colors';
-export * from './Type';
+export * from './Elevation';
 export * from './Image';
-
-export { elevation };
+export * from './Position';
+export * from './Type';

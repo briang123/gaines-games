@@ -1,6 +1,8 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { applyStyleModifiers } from 'styled-components-modifiers';
-import { teal, elevation } from './utilities';
+import { motion } from 'framer-motion';
+// import { teal, elevation } from './utilities';
+import { boxShadow } from './utilities/Elevation';
 
 const BUTTON_MODIFIERS = {
   small: () => `
@@ -8,27 +10,36 @@ const BUTTON_MODIFIERS = {
     padding: 3px 10px;
   `,
 
-  cancel: ({ theme }) => `
-    background: ${theme.colors.secondary}; 
-  `
+  // cancel: ({ theme }) => `
+  //   background: ${theme.colors.secondary}; 
+  // `
 };
 
-export const Button = styled.button`
+export const buttonCss = ({ bgColor }) => css`
   padding: 5px 20px;
   border-radius: 4px;
   color: white;
   font-size: 2rem;
   border: none;
-  transition: 0.3s ease box-shadow;
-  background: ${props => props.theme.colors.primary};
-  ${elevation[1]};
+  transition: 0.3s ease box-shadow; 
+  background: ${bgColor || 'none'};
+  ${boxShadow[1]};
   &:hover {
-    ${elevation[2]};
+    ${boxShadow[2]};
   }
 
   ${applyStyleModifiers(BUTTON_MODIFIERS)};
 `;
 
+export const Button = styled.button`
+  ${applyStyleModifiers(BUTTON_MODIFIERS)};
+  ${buttonCss}
+`;
+
 export const CancelButton = styled(Button)`
   background: tomato;
+`;
+
+export const MotionButton = styled(motion.button)`
+  ${buttonCss};
 `;

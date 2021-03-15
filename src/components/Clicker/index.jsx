@@ -29,12 +29,11 @@ export const Clicker = ({
     buttonText,
     clearPreviousGames,
     clickSaveKey,
-    clickThresholdInMS,
+    delayInMS,
     getFormattedClicks,
     getFormattedScore,
     getNewClicks,
     getNewScore,
-    incrementValue,
     resetValue,
     saveValue,
     scoreSaveKey,
@@ -87,9 +86,9 @@ export const Clicker = ({
     if (enterPress || spacePress) {
       setTimeout(() => {
         updateAndAnimateValues();
-      }, clickThresholdInMS);
+      }, delayInMS);
     }
-  }, [enterPress, spacePress, updateAndAnimateValues, clickThresholdInMS]);
+  }, [enterPress, spacePress, updateAndAnimateValues, delayInMS]);
 
   useEffect(() => {
     clearPreviousGames();
@@ -97,7 +96,8 @@ export const Clicker = ({
 
   const formattedScore = getFormattedScore(score);
   const formattedClicks = getFormattedClicks(clicks);
-  const formattedIncrements = getFormattedScore(incrementValue);
+  const incValue = clickerScore.getIncrementValue(score);
+  const formattedIncrements = getFormattedScore(incValue);
 
   return (
     <Layout>
@@ -160,12 +160,11 @@ const clickerScore = {
   unit: 'GNZ',
   symbol: '🤑',
   places: 3,
-  clickThresholdInMS: 400,
+  delayInMS: 400,
   placesToFormatWithCommas: 4,
   scoreSaveKey: 'clicker_score',
   clickSaveKey: 'clicker_clicks',
   buttonText: 'GNZ T🤑KNS',
-  incrementValue: 1,
   getFormattedValue: (value) => new Intl.NumberFormat().format(value),
   getIncrementValue: (value) => Math.floor(value / 100) || 1,
   getFormattedScore: (value) => {
@@ -181,13 +180,14 @@ const clickerScore = {
   getNewClicks: (value) => value + 1,
   getNewScore: (score) => {
     const incValue = clickerScore.getIncrementValue(score)
-    clickerScore.incrementValue = incValue;
     return score + incValue;
   },
   getFormattedClicks: (value) =>
     `👉 ${clickerScore.getFormattedValue(value)}`,
-  resetValue: (keys = []) =>
-    keys.map((key) => window.localStorage.removeItem(key)),
+  resetValue: (keys = []) => {
+    keys.map((key) => window.localStorage.removeItem(key));
+    clickerScore.incrementValue = 1;
+  },
   saveValue: (key, value) => window.localStorage.setItem(key, value),
   getValue: (key) => window.localStorage.getItem(key) || 0,
   clearPreviousGames: () => {

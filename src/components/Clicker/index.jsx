@@ -29,6 +29,7 @@ export const Clicker = ({
     buttonText,
     clearPreviousGames,
     clickSaveKey,
+    clickThresholdInMS,
     getFormattedClicks,
     getFormattedScore,
     getNewClicks,
@@ -73,8 +74,8 @@ export const Clicker = ({
   ]);
 
   const updateAndAnimateValues = useCallback(() => {
-    setIsAnimating(true);
-    updateValues();
+      setIsAnimating(true);
+      updateValues();
   }, [setIsAnimating, updateValues])
 
   const onClick = (e) => {
@@ -84,9 +85,11 @@ export const Clicker = ({
 
   useEffect(() => {
     if (enterPress || spacePress) {
-      updateAndAnimateValues();
+      setTimeout(() => {
+        updateAndAnimateValues();
+      }, clickThresholdInMS);
     }
-  }, [enterPress, spacePress, updateAndAnimateValues]);
+  }, [enterPress, spacePress, updateAndAnimateValues, clickThresholdInMS]);
 
   useEffect(() => {
     clearPreviousGames();
@@ -157,6 +160,7 @@ const clickerScore = {
   unit: 'GNZ',
   symbol: '🤑',
   places: 3,
+  clickThresholdInMS: 400,
   placesToFormatWithCommas: 4,
   scoreSaveKey: 'clicker_score',
   clickSaveKey: 'clicker_clicks',

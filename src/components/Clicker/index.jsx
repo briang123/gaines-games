@@ -25,7 +25,7 @@ export const Clicker = ({
   const spacePress = useKeyPress(keyboard.spaceBarText);
 
   const {
-    animationVariants,
+    animationVariants: av,
     buttonText,
     clearPreviousGames,
     clickSaveKey,
@@ -113,17 +113,17 @@ export const Clicker = ({
           initial="initial"
           animate={isAnimating ? 'animate' : 'initial'}
           exit="initial"
-          variants={animationVariants.score}
+          variants={av.score}
           color={primaryColor}
           bgColor={color}
           boxShadow={boxShadow}
-        ></Score>
+        />
         <Text
           key={`ScoreValue_${formattedScore}`}
           initial="initial"
           animate={isAnimating ? 'textAnimate' : 'initial'}
           exit="initial"
-          variants={animationVariants.score}
+          variants={av.score}
           color={primaryColor}
         >
           {formattedScore}
@@ -136,7 +136,7 @@ export const Clicker = ({
         whileTap="initial"
         animate="initial"
         exit="initial"
-        variants={animationVariants.button}
+        variants={av.button}
         onClick={onClick}
         colors={{ color, hoverBgColor: secondaryColor, bgColor: primaryColor }}
         boxShadow={boxShadow}
@@ -165,7 +165,7 @@ const clickerScore = {
   scoreSaveKey: 'clicker_score',
   clickSaveKey: 'clicker_clicks',
   buttonText: 'GNZ T🤑KNS',
-  incrementValue: 0,
+  incrementValue: 1,
   getFormattedValue: (value) => new Intl.NumberFormat().format(value),
   getIncrementValue: (value) => Math.floor(value / 100) || 1,
   getFormattedScore: (value) => {

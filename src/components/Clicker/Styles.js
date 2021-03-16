@@ -131,11 +131,12 @@ export const TokenButton = styled(MotionButton)`
     ${boxShadow};
     ${hover({ bgColor: hoverBgColor })};
     ${above.small`
-      ${dim({ w: '450px', h: '135px' })};
+      ${dim({ w: '350px', h: '85px' })};
       margin-top: 50px;
       font-size: 2.5rem;
     `};
      ${above.xl`
+      ${dim({ w: '450px', h: '125px' })};
       margin-top: 150px;
     `};
   `};

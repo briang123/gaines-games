@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { HexColorPicker } from "react-colorful";
 import useKeyPress from './../../hooks/useKeyPress';
 import {
   ClickAmount,
+  ColorButton,
+  ColorPickerContainer,
   IncrementValue,
   Layout,
   ResetButton,
@@ -20,6 +23,8 @@ export const Clicker = ({
   const [score, setScore] = useState(Number(initialScore));
   const [clicks, setClicks] = useState(Number(initialClicks));
   const [isAnimating, setIsAnimating] = useState(false);
+  const [pickedBgColor, setPickedBgColor] = useState(clickerStyle.black);
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   const enterPress = useKeyPress(keyboard.enterText);
   const spacePress = useKeyPress(keyboard.spaceBarText);
@@ -73,9 +78,14 @@ export const Clicker = ({
   ]);
 
   const updateAndAnimateValues = useCallback(() => {
-      setIsAnimating(true);
-      updateValues();
-  }, [setIsAnimating, updateValues])
+    setIsAnimating(true);
+    updateValues();
+  }, [setIsAnimating, updateValues]);
+
+  const onShowColorPickerClick = (e) => {
+    e.preventDefault();
+    setShowColorPicker((prevState) => !prevState);
+  };
 
   const onClick = (e) => {
     e.preventDefault();
@@ -100,56 +110,76 @@ export const Clicker = ({
   const formattedIncrements = getFormattedScore(incValue);
 
   return (
-    <Layout>
-    <Wrapper>
-      <ResetButton onClick={resetValues} color={primaryColor} bgColor={color}>
-        Reset
-      </ResetButton>
-      <ClickAmount color={primaryColor}>{formattedClicks}</ClickAmount>
-      <IncrementValue color={primaryColor}>{formattedIncrements}</IncrementValue>
-      <ScoreContainer>
-        <Score
-          key={`ScoreContainer_${formattedScore}`}
-          initial="initial"
-          animate={isAnimating ? 'animate' : 'initial'}
-          exit="initial"
-          variants={av.score}
+    <Layout bgColor={pickedBgColor}>
+      <Wrapper>
+        <ResetButton onClick={resetValues} color={primaryColor} bgColor={pickedBgColor}>
+          Reset
+        </ResetButton>
+        <ColorButton
+          onClick={onShowColorPickerClick}
           color={primaryColor}
-          bgColor={color}
-          boxShadow={boxShadow}
-        />
-        <Text
-          key={`ScoreValue_${formattedScore}`}
-          initial="initial"
-          animate={isAnimating ? 'textAnimate' : 'initial'}
-          exit="initial"
-          variants={av.score}
-          color={primaryColor}
+          bgColor={pickedBgColor}
         >
-          {formattedScore}
-        </Text>
-      </ScoreContainer>
-      <TokenButton
-        ref={tokenBtnRef}
-        key={`TokenButton_${formattedScore}`}
-        whileHover="hover"
-        whileTap="initial"
-        animate="initial"
-        exit="initial"
-        variants={av.button}
-        onClick={onClick}
-        colors={{ color, hoverBgColor: secondaryColor, bgColor: primaryColor }}
-        boxShadow={boxShadow}
-      >
-        {buttonText}
-      </TokenButton>
-    </Wrapper>
+          {showColorPicker ? `Hide Colors` : `Show Colors`}
+        </ColorButton>
+        {showColorPicker && (
+          <ColorPickerContainer>
+            <HexColorPicker 
+              color={pickedBgColor} 
+              onChange={setPickedBgColor}
+            />
+          </ColorPickerContainer>
+        )}
+        <ClickAmount color={primaryColor}>{formattedClicks}</ClickAmount>
+        <IncrementValue color={primaryColor}>
+          {formattedIncrements}
+        </IncrementValue>
+        <ScoreContainer>
+          <Score
+            key={`ScoreContainer_${formattedScore}`}
+            initial="initial"
+            animate={isAnimating ? 'animate' : 'initial'}
+            exit="initial"
+            variants={av.score}
+            color={primaryColor}
+            bgColor={color}
+            boxShadow={boxShadow}
+          />
+          <Text
+            key={`ScoreValue_${formattedScore}`}
+            initial="initial"
+            animate={isAnimating ? 'textAnimate' : 'initial'}
+            exit="initial"
+            variants={av.score}
+            color={primaryColor}
+          >
+            {formattedScore}
+          </Text>
+        </ScoreContainer>
+        <TokenButton
+          ref={tokenBtnRef}
+          key={`TokenButton_${formattedScore}`}
+          whileHover="hover"
+          whileTap="initial"
+          animate="initial"
+          exit="initial"
+          variants={av.button}
+          onClick={onClick}
+          colors={{
+            color,
+            hoverBgColor: secondaryColor,
+            bgColor: primaryColor,
+          }}
+          boxShadow={boxShadow}
+        >
+          {buttonText}
+        </TokenButton>
+      </Wrapper>
     </Layout>
   );
 };
 
 export default Clicker;
-
 
 const keyboard = {
   enterText: 'Enter',
@@ -179,11 +209,10 @@ const clickerScore = {
   },
   getNewClicks: (value) => value + 1,
   getNewScore: (score) => {
-    const incValue = clickerScore.getIncrementValue(score)
+    const incValue = clickerScore.getIncrementValue(score);
     return score + incValue;
   },
-  getFormattedClicks: (value) =>
-    `👉 ${clickerScore.getFormattedValue(value)}`,
+  getFormattedClicks: (value) => `👉 ${clickerScore.getFormattedValue(value)}`,
   resetValue: (keys = []) => {
     keys.map((key) => window.localStorage.removeItem(key));
     clickerScore.incrementValue = 1;

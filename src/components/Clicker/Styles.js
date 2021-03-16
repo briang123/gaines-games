@@ -10,17 +10,18 @@ import {
   dim,
   flex,
   hover,
-  radialBgGradient,
   textShadow,
 } from '../../elements/utilities';
 
 export const Layout = styled.div`
+${({ bgColor }) => css`
   ${flex()};
   ${dim({w: '100vw', h: '100vh'})};
-  ${radialBgGradient({color1: '#383A71', color2: '#161848'})};
+  background-color: ${bgColor};
   * {
     box-sizing: border-box;
   }
+`}; 
 `;
 
 export const Wrapper = styled.div`
@@ -39,6 +40,15 @@ export const ResetButton = styled.button`
     ${absolute()};
     ${hover({ bgColor: color, color: bgColor })};
   `};
+`;
+
+export const ColorButton = styled(ResetButton)`
+  ${dim({ w: '125px' })};
+  ${absolute({ x: '100px' })};
+`;
+
+export const ColorPickerContainer = styled.div`
+  ${absolute({ x: '70px', y: '40px' })};
 `;
 
 export const ClickAmount = styled.div`

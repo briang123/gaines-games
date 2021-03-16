@@ -88,6 +88,7 @@ export const Score = styled(motion.div)`
     `};
     ${above.xl`
       ${dim({ w: '600px', h: '600px' })};
+      
     `};
   `};
 `;
@@ -106,12 +107,15 @@ export const Text = styled(motion.div)`
     `};
     ${above.med`
       margin-top: -220px;
+      color: red;
     `};
      ${above.large`
       margin-top: -275px;
+      color: green;
     `};
      ${above.xl`
       margin-top: -350px;
+      color: magenta;
     `};
   `};
 `;

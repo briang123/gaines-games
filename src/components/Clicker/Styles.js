@@ -83,12 +83,8 @@ export const Score = styled(motion.div)`
     ${above.small`
       ${dim({ w: '400px', h: '400px' })};
     `};
-    ${above.large`
-      ${dim({ w: '500px', h: '500px' })};
-    `};
     ${above.xl`
       ${dim({ w: '600px', h: '600px' })};
-      
     `};
   `};
 `;
@@ -102,20 +98,17 @@ export const Text = styled(motion.div)`
     ${textShadow(color)};
     font-size: .8em;
     ${above.small`
-      font-size: min(5vw, 1em);
       margin-top: -210px;
     `};
     ${above.med`
-      margin-top: -220px;
-      color: red;
+      margin-top: -225px;
     `};
      ${above.large`
-      margin-top: -275px;
-      color: green;
+      margin-top: -230px;
     `};
      ${above.xl`
+      font-size: min(5vw, 1em);
       margin-top: -350px;
-      color: magenta;
     `};
   `};
 `;
@@ -139,8 +132,11 @@ export const TokenButton = styled(MotionButton)`
     ${hover({ bgColor: hoverBgColor })};
     ${above.small`
       ${dim({ w: '450px', h: '135px' })};
-      margin-top: 150px;
+      margin-top: 50px;
       font-size: 2.5rem;
+    `};
+     ${above.xl`
+      margin-top: 150px;
     `};
   `};
 `;

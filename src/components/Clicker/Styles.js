@@ -5,14 +5,14 @@ import { MotionButton, Heading1 } from '../../elements';
 import {
   above,
   absolute,
+  below,
+  fixed,
   dim,
   flex,
   hover,
   radialBgGradient,
   textShadow,
 } from '../../elements/utilities';
-
-// TODO: Fix for responsiveness (variable sizing)
 
 export const Layout = styled.div`
   ${flex()};
@@ -81,6 +81,12 @@ export const Score = styled(motion.div)`
     padding: 0px;
     ${boxShadow};
     ${above.small`
+      ${dim({ w: '400px', h: '400px' })};
+    `};
+    ${above.large`
+      ${dim({ w: '500px', h: '500px' })};
+    `};
+    ${above.xl`
       ${dim({ w: '600px', h: '600px' })};
     `};
   `};
@@ -89,12 +95,22 @@ export const Score = styled(motion.div)`
 export const Text = styled(motion.div)`
   ${({ color }) => css`
     ${flex()};
-    margin-top: -125px;
+    margin-top: -160px;
     z-index: 100;
-    font-size: min(5vw, 1em);
     color: ${color};
     ${textShadow(color)};
+    font-size: .8em;
     ${above.small`
+      font-size: min(5vw, 1em);
+      margin-top: -210px;
+    `};
+    ${above.med`
+      margin-top: -220px;
+    `};
+     ${above.large`
+      margin-top: -275px;
+    `};
+     ${above.xl`
       margin-top: -350px;
     `};
   `};
@@ -103,7 +119,10 @@ export const Text = styled(motion.div)`
 export const TokenButton = styled(MotionButton)`
   ${({ colors: { color, bgColor, hoverBgColor }, boxShadow }) => css`
     margin-top: 50px;
-    ${dim({ w: '300px', h: '85px' })}
+    ${dim({ w: '100vw', h: '85px' })}
+    ${below.small`
+      ${fixed({y: '10px', yProp: 'bottom'})};
+    `}
     font-size: 1.5rem;
     color: ${color};
     background-color: ${bgColor};

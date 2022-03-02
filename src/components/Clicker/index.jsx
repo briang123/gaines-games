@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { HexColorPicker } from "react-colorful";
+import { HexColorPicker } from 'react-colorful';
 import useKeyPress from './../../hooks/useKeyPress';
 import {
   ClickAmount,
@@ -93,12 +93,14 @@ export const Clicker = ({
   };
 
   useEffect(() => {
-    if (enterPress || spacePress) {
-      setTimeout(() => {
-        updateAndAnimateValues();
-      }, delayInMS);
-    }
-  }, [enterPress, spacePress, updateAndAnimateValues, delayInMS]);
+    // if (enterPress || spacePress) {
+    //   setTimeout(() => {
+    //     updateAndAnimateValues();
+    //   }, delayInMS);
+    // }
+    updateAndAnimateValues();
+  }, [enterPress, spacePress]);
+  // }, [enterPress, spacePress, updateAndAnimateValues, delayInMS]);
 
   useEffect(() => {
     clearPreviousGames();
@@ -112,7 +114,11 @@ export const Clicker = ({
   return (
     <Layout bgColor={pickedBgColor}>
       <Wrapper>
-        <ResetButton onClick={resetValues} color={primaryColor} bgColor={pickedBgColor}>
+        <ResetButton
+          onClick={resetValues}
+          color={primaryColor}
+          bgColor={pickedBgColor}
+        >
           Reset
         </ResetButton>
         <ColorButton
@@ -124,10 +130,7 @@ export const Clicker = ({
         </ColorButton>
         {showColorPicker && (
           <ColorPickerContainer>
-            <HexColorPicker 
-              color={pickedBgColor} 
-              onChange={setPickedBgColor}
-            />
+            <HexColorPicker color={pickedBgColor} onChange={setPickedBgColor} />
           </ColorPickerContainer>
         )}
         <ClickAmount color={primaryColor}>{formattedClicks}</ClickAmount>
